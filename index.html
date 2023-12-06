@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe Game</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="app">
+    <div class="game-board">
+      <div v-for="(row, rowIndex) in board" :key="rowIndex" class="row">
+        <div v-for="(cell, colIndex) in row" :key="colIndex" class="cell" @click="makeMove(rowIndex, colIndex)">
+          {{ cell }}
+        </div>
+      </div>
+      <div v-if="gameOver" class="game-over">{{ winner ? `${winner} wins!` : "It's a draw!" }}</div>
+      <button v-if="gameOver" @click="restartGame">Restart</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script>
+    new Vue({
+      el: "#app",
+      data() {
+        return {
+          board: [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+          ],
+          currentPlayer: 'X',
+          gameOver: false,
+          winner: null
+        };
+      },
+      methods: {
+        makeMove(row, col) {
+          if (!this.gameOver && this.board[row][col] === '') {
+            this.$set(this.board[row], col, this.currentPlayer);
+            if (this.checkWin(row, col)) {
+              this.gameOver = true;
+              this.winner = this.currentPlayer;
+            } else if (this.checkDraw()) {
+              this.gameOver = true;
+            } else {
+              this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+            }
+          }
+        },
+        checkWin(row, col) {
+    // Check for a win in the current row
+    if (
+      this.board[row][0] === this.currentPlayer &&
+      this.board[row][1] === this.currentPlayer &&
+      this.board[row][2] === this.currentPlayer
+    ) {
+      return true;
+    }
+
+    // Check for a win in the current column
+    if (
+      this.board[0][col] === this.currentPlayer &&
+      this.board[1][col] === this.currentPlayer &&
+      this.board[2][col] === this.currentPlayer
+    ) {
+      return true;
+    }
+
+    // Check for a win in the diagonal from top-left to bottom-right
+    if (row === col && this.board[0][0] === this.currentPlayer && this.board[1][1] === this.currentPlayer && this.board[2][2] === this.currentPlayer) {
+      return true;
+    }
+
+    // Check for a win in the diagonal from top-right to bottom-left
+    if (row + col === 2 && this.board[0][2] === this.currentPlayer && this.board[1][1] === this.currentPlayer && this.board[2][0] === this.currentPlayer) {
+      return true;
+    }
+
+    return false;
+  },
+
+  checkDraw() {
+    // Check for a draw (all cells filled)
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        if (this.board[row][col] === '') {
+          // Found an empty cell, the game is not a draw
+          return false;
+        }
+      }
+    }
+    // All cells are filled, and no one has won, it's a draw
+    return true;
+  },
+        restartGame() {
+          this.board = [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+          ];
+          this.currentPlayer = 'X';
+          this.gameOver = false;
+          this.winner = null;
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>
